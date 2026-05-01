@@ -1,0 +1,18 @@
+package br.com.alisson.client;
+
+import br.com.alisson.dto.RawGameResponseDTO;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient(configKey = "rawg-api")
+@Path("/games")
+public interface RawgClient {
+
+    @GET
+    RawGameResponseDTO buscarJogosPorNome(
+            @QueryParam("search") String nome,
+            @QueryParam("key") String chaveApi
+    );
+}
