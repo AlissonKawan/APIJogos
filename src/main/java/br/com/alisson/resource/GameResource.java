@@ -1,5 +1,6 @@
 package br.com.alisson.resource;
 
+import br.com.alisson.dto.RawGameResponseDTO;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -20,7 +21,7 @@ public class GameResource {
     // search é para definir: esse metodo responde quando alguem chamar por /games/search
     // QueryParam : pega valor da URL: exemplo: http://localhost:8080/games/search?name=god
     @Path("/search")
-    public String buscar(@QueryParam("name") String nome) {
+    public RawGameResponseDTO buscar(@QueryParam("name") String nome) {
         return gameService.buscarJogos(nome);
     }
     //resumindo acima: esse metodo responde quando alguem chamar por get

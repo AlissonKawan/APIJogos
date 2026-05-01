@@ -9,6 +9,7 @@ public class RawGameDTO {
     private Double rating;
     private String released;
 
+    //como o backgound image vem diferente com underline preciso colocar essa anotação para seguir o padrão da API
     @JsonProperty("background_image")
     private String backgroundImage;
 
