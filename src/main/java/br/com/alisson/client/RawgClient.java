@@ -6,6 +6,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+/*
+    Função do client: buscar ligar para API externa, ou seja, ele que chama a API para o service decidir, e o
+    Resource/Controller usar/receber
+ */
 @RegisterRestClient(configKey = "rawg-api")
 @Path("/games")
 public interface RawgClient {
