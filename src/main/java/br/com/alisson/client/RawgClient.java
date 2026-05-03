@@ -11,6 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
     Resource/Controller usar/receber
  */
 @RegisterRestClient(configKey = "rawg-api")
+//definir endpoint definir caminho oq fica dos do barra no sitezinho
 @Path("/games")
 public interface RawgClient {
 

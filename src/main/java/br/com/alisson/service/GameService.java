@@ -1,11 +1,15 @@
 package br.com.alisson.service;
 
 import br.com.alisson.client.RawgClient;
+import br.com.alisson.dto.GameResponseDTO;
+import br.com.alisson.dto.RawGameDTO;
 import br.com.alisson.dto.RawGameResponseDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+import java.util.List;
 
 /*
     O Service é a lógica, o cérebro do negócio.
@@ -30,7 +34,22 @@ public class GameService {
     @ConfigProperty(name = "rawg.api.key")
     String apiKey;
 
-    public RawGameResponseDTO buscarJogos(String nome) {
-        return rawgClient.buscarJogosPorNome(nome, apiKey);
+    public List<GameResponseDTO> buscarJogos(String nome) {
+
+        RawGameResponseDTO respostaRawg = rawgClient.buscarJogosPorNome(nome, apiKey);
+
+        List<RawGameDTO> jogosRawg = respostaRawg.getResults();
+
+        List<GameResponseDTO> jogosTratados = jogosRawg.stream()
+                .map(jogo -> new GameResponseDTO(
+                        jogo.getId(),
+                        jogo.getName(),
+                        jogo.getRating(),
+                        jogo.getReleased(),
+                        jogo.getBackgroundImage()
+                ))
+                .toList();
+
+        return jogosTratados;
     }
 }
