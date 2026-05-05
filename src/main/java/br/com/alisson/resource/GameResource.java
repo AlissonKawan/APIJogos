@@ -1,11 +1,13 @@
 package br.com.alisson.resource;
 
-import br.com.alisson.dto.RawGameResponseDTO;
+import br.com.alisson.dto.GameResponseDTO;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.inject.Inject;
 import br.com.alisson.service.GameService;
+
+import java.util.List;
 
 /*
     Preciso usar dois paths, um é para endereço padrão da classe, outro é para endereço do método.
@@ -29,7 +31,7 @@ public class GameResource {
 
     // @QueryParam pega o valor do parâmetro name da URL e coloca na variável 'nome'.
     // Exemplo: http://localhost:8080/games/search?name=god
-    public RawGameResponseDTO buscar(@QueryParam("name") String nome) {
+    public List<GameResponseDTO> buscar(@QueryParam("name") String nome) {
         return gameService.buscarJogos(nome);
     }
 

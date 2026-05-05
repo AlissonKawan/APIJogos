@@ -24,9 +24,9 @@ public class GameService {
 
     // Serve para pedir uma dependência pronta para o Quarkus.
     @Inject
-
     // Serve para avisar que o objeto injetado é um client HTTP externo.
     // Quarkus, injeta aqui o client HTTP da RAWG.
+    //basicamente como eu defini na classe client para registrar ele como rest client eu posso injetar ele aqui também.
     @RestClient
     RawgClient rawgClient;
 
@@ -36,11 +36,35 @@ public class GameService {
 
     public List<GameResponseDTO> buscarJogos(String nome) {
 
+        /*
+        aqui estou criando uma variavel para facilitar minha busca de jogos por nome
+        ou seja respostaRawg vai guardar essa operação de chmar client e o metodo dele que é buscar jogos por nome!
+        exemplo: busque um jogo na Api rawg, quando a resposta voltar guarde ela nessa variavel
+        so que respostaRawg é a resposta completa da API
+         */
         RawGameResponseDTO respostaRawg = rawgClient.buscarJogosPorNome(nome, apiKey);
 
+        /*
+        aqui estou criando uma lista do tipo RawGameDTO que é a representação de cada jogo
+        e estou definindo que jogosRawg vai receber a resposta da api
+        quero somente o results da api por isso estou usando o getResults
+
+        "Me dá a lista de jogos que veio dentro de results"
+         */
         List<RawGameDTO> jogosRawg = respostaRawg.getResults();
 
+        /*
+            “Para cada jogo cru da lista, crie um jogo tratado e
+            depois junte tudo em uma nova lista”
+            O stream() transforma essa lista em uma sequência de processamento.
+            O map serve para transformar uma coisa em outra.
+
+            o jogo é uma variavel temporaria
+            usamos o lambda para transformar ele em um objeto GameResponse
+
+         */
         List<GameResponseDTO> jogosTratados = jogosRawg.stream()
+                //ou seja para cada RawGame, ele cria um ResponseDTO
                 .map(jogo -> new GameResponseDTO(
                         jogo.getId(),
                         jogo.getName(),
@@ -49,7 +73,8 @@ public class GameService {
                         jogo.getBackgroundImage()
                 ))
                 .toList();
+        //depois que o maps transforma a lista, ele passa para o toList para criar uma nova lista final
 
         return jogosTratados;
-    }
+    } //todo esse método foi para transformar uma resposta formatada do tipo GameResponseDTO
 }

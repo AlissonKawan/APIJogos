@@ -2,7 +2,7 @@ package br.com.alisson.dto;
 
 
 /*
-    Criando essa classe para formatar os dados que vem dda api externa para minha API, minha api vai tratar os dados em português, da forma que eu quero mais bonito
+    Criando essa classe para formatar os dados que vem da api externa para minha API, minha api vai tratar os dados em português, da forma que eu quero mais bonito
 
     o Service vai fazer a conversão de rawGame para > GameResponse
  */
