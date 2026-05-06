@@ -4,8 +4,11 @@ import br.com.alisson.client.RawgClient;
 import br.com.alisson.dto.GameResponseDTO;
 import br.com.alisson.dto.RawGameDTO;
 import br.com.alisson.dto.RawGameResponseDTO;
+import br.com.alisson.entity.GameEntity;
+import br.com.alisson.repository.GameRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -29,6 +32,9 @@ public class GameService {
     //basicamente como eu defini na classe client para registrar ele como rest client eu posso injetar ele aqui também.
     @RestClient
     RawgClient rawgClient;
+
+    @Inject
+    GameRepository gameRepository;
 
     // Isso pega o valor do application.properties.
     @ConfigProperty(name = "rawg.api.key")
@@ -77,4 +83,55 @@ public class GameService {
 
         return jogosTratados;
     } //todo esse método foi para transformar uma resposta formatada do tipo GameResponseDTO
+
+    /*
+        Recebe um objeto GameEntity salva no banco
+        usando o repository e depois devolve o objeto salvo
+        Transactional diz: tudo que acontecer nesse metodo deve acontecer numa transação de banco
+        por traz desse metodo o quarkus faz:
+        -abre transação
+        -executa persist
+        -se não der erro, confirma
+        -se der erro, desfaz
+        -fecha transação
+     */
+    @Transactional
+    public GameEntity salvarJogo(GameEntity game) {
+        gameRepository.persist(game);
+        return game;
+    }
+    public List<GameEntity> listarJogosSalvos() {
+        return gameRepository.listAll();
+    }
+
+    public GameEntity buscarJogoSalvoPorId(Long id) {
+        return gameRepository.findById(id);
+    }
+
+    @Transactional
+    public boolean deletarJogo(Long id) {
+        return gameRepository.deleteById(id);
+    }
+
+    /*
+        aqui vamos receber um put do resource. e quando recebermos vamos colocar como parametro "gameAtualizado"
+        ai o quarkus vai validar usando o Transactional
+     */
+    @Transactional
+    public GameEntity atualizarJogo(Long id, GameEntity gameAtualizado) {
+
+        GameEntity gameExistente = gameRepository.findById(id);
+
+        if (gameExistente == null) {
+            return null;
+        }
+
+        gameExistente.setNome(gameAtualizado.getNome());
+        gameExistente.setNota(gameAtualizado.getNota());
+        gameExistente.setDataLancamento(gameAtualizado.getDataLancamento());
+        gameExistente.setImagem(gameAtualizado.getImagem());
+
+        return gameExistente;
+    }
+
 }
