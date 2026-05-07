@@ -1,29 +1,32 @@
 package br.com.alisson.dto;
 
-
 /*
-    Criando essa classe para formatar os dados que vem da api externa para minha API, minha api vai tratar os dados em português, da forma que eu quero mais bonito
+    Essa classe formata os dados que vêm da API externa RAWG
+    para a resposta da nossa API.
 
-    o Service vai fazer a conversão de rawGame para > GameResponse
+    O Service faz a conversão de RawGameDTO para GameResponseDTO.
+
+    Aqui usamos rawgId para deixar claro que esse ID veio da API RAWG,
+    e não é o ID interno do nosso banco de dados.
  */
 public class GameResponseDTO {
 
-    private Long id;
+    private Long rawgId;
     private String nome;
     private Double nota;
-    private String lancamento;
+    private String dataLancamento;
     private String imagem;
 
-    public GameResponseDTO(Long id, String nome, Double nota, String lancamento, String imagem) {
-        this.id = id;
+    public GameResponseDTO(Long rawgId, String nome, Double nota, String dataLancamento, String imagem) {
+        this.rawgId = rawgId;
         this.nome = nome;
         this.nota = nota;
-        this.lancamento = lancamento;
+        this.dataLancamento = dataLancamento;
         this.imagem = imagem;
     }
 
-    public Long getId() {
-        return id;
+    public Long getRawgId() {
+        return rawgId;
     }
 
     public String getNome() {
@@ -34,8 +37,8 @@ public class GameResponseDTO {
         return nota;
     }
 
-    public String getLancamento() {
-        return lancamento;
+    public String getDataLancamento() {
+        return dataLancamento;
     }
 
     public String getImagem() {
