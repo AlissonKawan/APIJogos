@@ -2,7 +2,9 @@
 
 Projeto desenvolvido em Java com Quarkus para consumo da API externa RAWG, tratamento dos dados recebidos e disponibilização desses dados por meio de endpoints REST.
 
-O sistema permite buscar jogos pelo nome, consultar informações relevantes vindas da API externa e estruturar essas informações de forma mais simples para o usuário final. O projeto também foi organizado seguindo separação de responsabilidades em camadas, com Resource, Service, Client, DTOs e camada de persistência.
+O sistema permite buscar jogos pelo nome, consultar informações relevantes vindas da API externa e estruturar essas informações de forma mais simples para o usuário final.
+
+O projeto também foi organizado seguindo separação de responsabilidades em camadas, com `Resource`, `Service`, `Client`, `DTOs`, `Entity`, `Repository` e camada de persistência.
 
 ---
 
@@ -18,7 +20,7 @@ O objetivo deste projeto é desenvolver uma aplicação Java capaz de:
 - Realizar persistência e consulta em banco de dados;
 - Aplicar arquitetura em camadas.
 
-Este projeto foi desenvolvido como parte do Checkpoint 5 da disciplina de Domain Driven Design.
+Este projeto foi desenvolvido como parte do Checkpoint 5 da disciplina de **Domain Driven Design**.
 
 ---
 
@@ -81,51 +83,71 @@ src/main/java/br/com/alisson/
 │
 └── service/
     └── GameService.java
-🧱 Arquitetura em Camadas
-Resource
+```
 
-A camada Resource é responsável por expor os endpoints da aplicação.
+---
+
+## 🧱 Arquitetura em Camadas
+
+### Resource
+
+A camada `Resource` é responsável por expor os endpoints da aplicação.
 
 Ela recebe as requisições HTTP, captura os parâmetros enviados pelo usuário e chama a camada de serviço.
 
 Exemplo:
 
+```java
 @Path("/games")
 public class GameResource {
     // endpoints da API
 }
-Service
+```
 
-A camada Service contém a regra de negócio da aplicação.
+---
+
+### Service
+
+A camada `Service` contém a regra de negócio da aplicação.
 
 Ela é responsável por:
 
-Chamar o client da API externa;
-Tratar os dados recebidos;
-Converter DTOs externos em DTOs internos;
-Coordenar operações de persistência;
-Retornar os dados já organizados para a Resource.
+- Chamar o client da API externa;
+- Tratar os dados recebidos;
+- Converter DTOs externos em DTOs internos;
+- Coordenar operações de persistência;
+- Retornar os dados já organizados para a Resource.
 
-Exemplo de responsabilidade:
+Exemplo:
 
+```java
 public List<GameResponseDTO> buscarJogos(String nome) {
     // chama API externa
     // trata os dados
     // retorna resposta organizada
 }
-Client
+```
 
-A camada Client é responsável pela comunicação com a API externa RAWG.
+---
+
+### Client
+
+A camada `Client` é responsável pela comunicação com a API externa RAWG.
 
 Ela utiliza o MicroProfile REST Client para realizar as requisições HTTP.
 
 Exemplo:
 
+```java
 @RegisterRestClient
 public interface RawgClient {
     // chamada para a API RAWG
 }
-DTO
+```
+
+---
+
+### DTO
 
 Os DTOs são usados para transportar dados entre as camadas da aplicação.
 
@@ -133,15 +155,19 @@ Eles evitam que a aplicação exponha diretamente a estrutura completa da API ex
 
 Principais DTOs:
 
-RawGameDTO: representa os dados brutos recebidos da RAWG;
-RawGameResponseDTO: representa a resposta completa da RAWG;
-GameResponseDTO: representa os dados tratados que serão retornados ao usuário.
-Entity
+- `RawGameDTO`: representa os dados brutos recebidos da RAWG;
+- `RawGameResponseDTO`: representa a resposta completa da RAWG;
+- `GameResponseDTO`: representa os dados tratados que serão retornados ao usuário.
 
-A camada Entity representa a tabela do banco de dados.
+---
+
+### Entity
+
+A camada `Entity` representa a tabela do banco de dados.
 
 Exemplo:
 
+```java
 @Entity
 public class Game {
     @Id
@@ -154,23 +180,43 @@ public class Game {
     private String released;
     private String backgroundImage;
 }
-Repository
+```
 
-A camada Repository é responsável pelas operações com o banco de dados.
+---
+
+### Repository
+
+A camada `Repository` é responsável pelas operações com o banco de dados.
 
 Ela centraliza consultas, persistência e manipulação dos dados salvos.
 
 Exemplo:
 
+```java
 @ApplicationScoped
 public class GameRepository implements PanacheRepository<Game> {
 }
-🔗 Endpoints da API
-Buscar jogos pelo nome
+```
+
+---
+
+## 🔗 Endpoints da API
+
+### Buscar jogos pelo nome
+
+```http
 GET /games/search?name={nome}
-Exemplo de requisição
+```
+
+Exemplo de requisição:
+
+```http
 GET http://localhost:8080/games/search?name=god
-Exemplo de resposta
+```
+
+Exemplo de resposta:
+
+```json
 [
   {
     "id": 3498,
@@ -180,9 +226,19 @@ Exemplo de resposta
     "backgroundImage": "https://media.rawg.io/media/games/example.jpg"
   }
 ]
-Salvar jogo no banco de dados
+```
+
+---
+
+### Salvar jogo no banco de dados
+
+```http
 POST /games
-Exemplo de requisição
+```
+
+Exemplo de requisição:
+
+```json
 {
   "rawgId": 3498,
   "name": "Grand Theft Auto V",
@@ -190,7 +246,11 @@ Exemplo de requisição
   "released": "2013-09-17",
   "backgroundImage": "https://media.rawg.io/media/games/example.jpg"
 }
-Exemplo de resposta
+```
+
+Exemplo de resposta:
+
+```json
 {
   "id": 1,
   "rawgId": 3498,
@@ -199,9 +259,19 @@ Exemplo de resposta
   "released": "2013-09-17",
   "backgroundImage": "https://media.rawg.io/media/games/example.jpg"
 }
-Listar jogos salvos
+```
+
+---
+
+### Listar jogos salvos
+
+```http
 GET /games
-Exemplo de resposta
+```
+
+Exemplo de resposta:
+
+```json
 [
   {
     "id": 1,
@@ -212,22 +282,49 @@ Exemplo de resposta
     "backgroundImage": "https://media.rawg.io/media/games/example.jpg"
   }
 ]
-Buscar jogo salvo por ID
+```
+
+---
+
+### Buscar jogo salvo por ID
+
+```http
 GET /games/{id}
-Exemplo
+```
+
+Exemplo:
+
+```http
 GET http://localhost:8080/games/1
-Remover jogo salvo
+```
+
+---
+
+### Remover jogo salvo
+
+```http
 DELETE /games/{id}
-Exemplo
+```
+
+Exemplo:
+
+```http
 DELETE http://localhost:8080/games/1
-⚙️ Configuração do Projeto
+```
+
+---
+
+## ⚙️ Configuração do Projeto
 
 As configurações da aplicação ficam no arquivo:
 
+```text
 src/main/resources/application.properties
+```
 
 Exemplo de configuração:
 
+```properties
 # Porta da aplicação
 quarkus.http.port=8080
 
@@ -246,40 +343,79 @@ quarkus.datasource.password=
 # Hibernate
 quarkus.hibernate-orm.database.generation=drop-and-create
 quarkus.hibernate-orm.log.sql=true
+```
 
-Importante: a chave da API não deve ser enviada publicamente em repositórios abertos. O ideal é utilizar variável de ambiente ou manter o repositório privado.
+> **Importante:** a chave da API não deve ser enviada publicamente em repositórios abertos. O ideal é utilizar variável de ambiente ou manter o repositório privado.
 
-▶️ Como Executar o Projeto
-1. Clonar o repositório
+---
+
+## ▶️ Como Executar o Projeto
+
+### 1. Clonar o repositório
+
+```bash
 git clone URL_DO_REPOSITORIO
-2. Entrar na pasta do projeto
+```
+
+### 2. Entrar na pasta do projeto
+
+```bash
 cd nome-do-projeto
-3. Configurar a chave da API
+```
 
-No arquivo application.properties, configure:
+### 3. Configurar a chave da API
 
+No arquivo `application.properties`, configure:
+
+```properties
 rawg.api.key=SUA_CHAVE_DA_RAWG
-4. Executar o projeto em modo desenvolvimento
+```
+
+### 4. Executar o projeto em modo desenvolvimento
+
+```bash
 ./mvnw quarkus:dev
+```
 
 No Windows:
 
+```bash
 mvnw.cmd quarkus:dev
-5. Acessar a aplicação
+```
+
+### 5. Acessar a aplicação
+
+```text
 http://localhost:8080
-🧪 Como Testar
+```
+
+---
+
+## 🧪 Como Testar
 
 O teste dos endpoints pode ser feito pelo navegador, Postman ou Insomnia.
 
-Buscar jogos
+### Buscar jogos
+
+```http
 GET http://localhost:8080/games/search?name=far%20cry
-Listar jogos salvos
+```
+
+### Listar jogos salvos
+
+```http
 GET http://localhost:8080/games
-Salvar jogo
+```
+
+### Salvar jogo
+
+```http
 POST http://localhost:8080/games
+```
 
 Body:
 
+```json
 {
   "rawgId": 123,
   "name": "Exemplo de Jogo",
@@ -287,22 +423,27 @@ Body:
   "released": "2020-01-01",
   "backgroundImage": "https://exemplo.com/imagem.jpg"
 }
-🔄 Fluxo de Funcionamento
+```
+
+---
+
+## 🔄 Fluxo de Funcionamento
 
 O fluxo principal da aplicação funciona da seguinte forma:
 
-O usuário faz uma requisição para o endpoint /games/search;
-A GameResource recebe a requisição;
-A GameResource chama a GameService;
-A GameService chama o RawgClient;
-O RawgClient acessa a API externa RAWG;
-A RAWG retorna uma lista de jogos;
-A GameService trata os dados recebidos;
-Os dados são convertidos para GameResponseDTO;
-A resposta é retornada ao usuário em formato JSON.
+1. O usuário faz uma requisição para o endpoint `/games/search`;
+2. A `GameResource` recebe a requisição;
+3. A `GameResource` chama a `GameService`;
+4. A `GameService` chama o `RawgClient`;
+5. O `RawgClient` acessa a API externa RAWG;
+6. A RAWG retorna uma lista de jogos;
+7. A `GameService` trata os dados recebidos;
+8. Os dados são convertidos para `GameResponseDTO`;
+9. A resposta é retornada ao usuário em formato JSON.
 
 Fluxo resumido:
 
+```text
 Usuário
   ↓
 GameResource
@@ -318,22 +459,27 @@ GameService
 GameResponseDTO
   ↓
 Usuário
-🧠 Tratamento dos Dados
+```
+
+---
+
+## 🧠 Tratamento dos Dados
 
 A API RAWG retorna muitos dados que nem sempre são necessários para o usuário.
 
 Por isso, o projeto realiza o tratamento dos dados e retorna apenas as informações mais importantes:
 
-ID do jogo;
-Nome;
-Avaliação;
-Data de lançamento;
-Imagem de fundo.
+- ID do jogo;
+- Nome;
+- Avaliação;
+- Data de lançamento;
+- Imagem de fundo.
 
 Isso deixa a resposta mais limpa, organizada e fácil de consumir.
 
 Exemplo de dado vindo da RAWG:
 
+```json
 {
   "id": 3498,
   "name": "Grand Theft Auto V",
@@ -341,9 +487,11 @@ Exemplo de dado vindo da RAWG:
   "released": "2013-09-17",
   "background_image": "https://media.rawg.io/media/games/example.jpg"
 }
+```
 
 Exemplo de dado tratado pela aplicação:
 
+```json
 {
   "id": 3498,
   "name": "Grand Theft Auto V",
@@ -351,98 +499,135 @@ Exemplo de dado tratado pela aplicação:
   "released": "2013-09-17",
   "backgroundImage": "https://media.rawg.io/media/games/example.jpg"
 }
-🗄️ Persistência em Banco de Dados
+```
+
+---
+
+## 🗄️ Persistência em Banco de Dados
 
 O projeto possui persistência em banco de dados para armazenar jogos consultados ou selecionados pelo usuário.
 
-A entidade principal é Game.
+A entidade principal é `Game`.
 
 Tabela esperada:
 
+```text
 GAME
+```
 
 Campos principais:
 
-Campo	Tipo	Descrição
-id	Long	Identificador interno no banco
-rawgId	Long	ID original do jogo na API RAWG
-name	String	Nome do jogo
-rating	Double	Avaliação do jogo
-released	String	Data de lançamento
-backgroundImage	String	URL da imagem do jogo
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `id` | Long | Identificador interno no banco |
+| `rawgId` | Long | ID original do jogo na API RAWG |
+| `name` | String | Nome do jogo |
+| `rating` | Double | Avaliação do jogo |
+| `released` | String | Data de lançamento |
+| `backgroundImage` | String | URL da imagem do jogo |
 
 A persistência permite que a aplicação não dependa apenas da API externa para consultar dados já salvos.
 
-✅ Funcionalidades Implementadas
-Consumo da API externa RAWG;
-Endpoint para busca de jogos;
-Tratamento dos dados recebidos;
-Conversão de dados externos para DTO interno;
-Organização do projeto em camadas;
-Persistência de jogos no banco de dados;
-Consulta de jogos salvos;
-Remoção de jogos salvos;
-Retorno das informações em JSON.
-📌 Regras de Negócio
-O usuário pode buscar jogos informando parte do nome;
-A aplicação consulta a API externa RAWG;
-Os dados retornados são tratados antes de serem exibidos;
-Apenas informações relevantes são retornadas;
-Jogos podem ser persistidos no banco de dados;
-Jogos salvos podem ser consultados posteriormente.
-🚨 Possíveis Erros
-API Key inválida
+---
+
+## ✅ Funcionalidades Implementadas
+
+- Consumo da API externa RAWG;
+- Endpoint para busca de jogos;
+- Tratamento dos dados recebidos;
+- Conversão de dados externos para DTO interno;
+- Organização do projeto em camadas;
+- Persistência de jogos no banco de dados;
+- Consulta de jogos salvos;
+- Remoção de jogos salvos;
+- Retorno das informações em JSON.
+
+---
+
+## 📌 Regras de Negócio
+
+- O usuário pode buscar jogos informando parte do nome;
+- A aplicação consulta a API externa RAWG;
+- Os dados retornados são tratados antes de serem exibidos;
+- Apenas informações relevantes são retornadas;
+- Jogos podem ser persistidos no banco de dados;
+- Jogos salvos podem ser consultados posteriormente.
+
+---
+
+## 🚨 Possíveis Erros
+
+### API Key inválida
 
 Caso a chave da RAWG esteja incorreta, a API externa pode retornar erro de autorização.
 
 Solução:
 
+```properties
 rawg.api.key=SUA_CHAVE_CORRETA
-Porta 8080 em uso
+```
+
+---
+
+### Porta 8080 em uso
 
 Caso a porta 8080 já esteja sendo usada, o Quarkus pode não iniciar corretamente.
 
 Solução:
 
+```properties
 quarkus.http.port=8081
+```
 
 Ou finalizar o processo que está usando a porta 8080.
 
-Nome não informado na busca
+---
 
-Se o parâmetro name não for enviado, a aplicação pode retornar erro ou lista vazia.
+### Nome não informado na busca
+
+Se o parâmetro `name` não for enviado, a aplicação pode retornar erro ou lista vazia.
 
 Exemplo incorreto:
 
+```http
 GET /games/search
+```
 
 Exemplo correto:
 
+```http
 GET /games/search?name=god
-📚 Conceitos Aplicados
-API REST;
-Consumo de API externa;
-DTO;
-Entity;
-Repository;
-Service;
-Resource;
-Injeção de dependência;
-Persistência em banco de dados;
-Arquitetura em camadas;
-JSON;
-HTTP GET, POST e DELETE.
-👨‍💻 Autor
+```
 
-Projeto desenvolvido por Alisson Kawan.
+---
 
-Curso: Análise e Desenvolvimento de Sistemas
-Disciplina: Domain Driven Design
-Professor: Fernando Almeida
+## 📚 Conceitos Aplicados
 
-📄 Licença
+- API REST;
+- Consumo de API externa;
+- DTO;
+- Entity;
+- Repository;
+- Service;
+- Resource;
+- Injeção de dependência;
+- Persistência em banco de dados;
+- Arquitetura em camadas;
+- JSON;
+- HTTP GET, POST e DELETE.
+
+---
+
+## 👨‍💻 Autor
+
+Projeto desenvolvido por **Alisson Kawan, Eduardo Boni e Marcos Vinicius**.
+
+Curso: **Análise e Desenvolvimento de Sistemas**  
+Disciplina: **Domain Driven Design**  
+Professor: **Fernando Almeida**
+
+---
+
+## 📄 Licença
 
 Este projeto foi desenvolvido para fins acadêmicos.
-
-
-Só uma coisa importante: se no teu código **ainda não tiver** `POST /games`, `GET /games`, `GET /games/{id}` e `DELETE /games/{id}`, não mete isso no README como se estivesse pronto, porque aí vira mentira bonita — e professor percebe essa merda fácil. Nesse caso, deixa só o `/games/search` ou coloca como “funcionalidades previstas”.
